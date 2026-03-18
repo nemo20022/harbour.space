@@ -39,8 +39,10 @@ class Countdown:
 
     def __init__(self, n: int) -> None:
         self.current=n
+        self.start=n
 
     def __iter__(self) -> Iterator[int]:
+        self.current=self.start
         return self
 
     def __next__(self) -> int:
@@ -76,7 +78,7 @@ class StepIterator:
         return self
 
     def __next__(self) -> Any:
-        if self.index >len(self.values):
+        if self.index >=len(self.values):
             raise StopIteration
         v=self.values[self.index]
         self.index+=self.step
@@ -200,7 +202,17 @@ def batch(iterable: Iterable[Any], size: int) -> Iterator[list[Any]]:
     >>> list(batch([1, 2, 3, 4, 5, 6, 7], 3))
     [[1, 2, 3], [4, 5, 6], [7]]
     """
-    raise NotImplementedError
+    if size<1:
+        raise ValueError
+    l=[]
+    for i in iterable:
+        l.append(i)
+        if len(l)==size:
+            yield l
+            l=[]
+    if l:
+        yield l
+
 
 
 def flatten(data: list[Any]) -> Iterator[Any]:
@@ -212,106 +224,110 @@ def flatten(data: list[Any]) -> Iterator[Any]:
     >>> list(flatten([1, [2, 3], [4, [5, 6]], 7]))
     [1, 2, 3, 4, 5, 6, 7]
     """
-    raise NotImplementedError
+    for i in data:
+        if isinstance(i,list):
+            yield from flatten(i)
+        else:
+            yield i
 
 
-def log_calls(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Problem 9. `log_calls` decorator.
+# def log_calls(func: Callable[..., Any]) -> Callable[..., Any]:
+#     """Problem 9. `log_calls` decorator.
 
-    Print each function call in this format:
-    `name(arg1, arg2, kw=value) -> result`
+#     Print each function call in this format:
+#     `name(arg1, arg2, kw=value) -> result`
 
-    Hint:
-    - Function name: `func.__name__`
-    - Positional values: `args`
-    - Keyword names/values: `kwargs.items()`
+#     Hint:
+#     - Function name: `func.__name__`
+#     - Positional values: `args`
+#     - Keyword names/values: `kwargs.items()`
 
-    Example:
-    >>> @log_calls
-    ... def add(a, b):
-    ...     return a + b
-    >>> add(2, 3)
-    add(2, 3) -> 5
-    5
-    """
-    raise NotImplementedError
-
-
-def measure_time(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Problem 10. `measure_time` decorator.
-
-    Measure function execution time and print:
-    `Executed in <milliseconds> ms`
-
-    Example:
-    >>> @measure_time
-    ... def work():
-    ...     return "done"
-    >>> work()
-    done
-    """
-    raise NotImplementedError
+#     Example:
+#     >>> @log_calls
+#     ... def add(a, b):
+#     ...     return a + b
+#     >>> add(2, 3)
+#     add(2, 3) -> 5
+#     5
+#     """
+#     raise NotImplementedError
 
 
-def count_calls(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Problem 11. `count_calls` decorator.
+# def measure_time(func: Callable[..., Any]) -> Callable[..., Any]:
+#     """Problem 10. `measure_time` decorator.
 
-    Count how many times the wrapped function is called.
-    Store the counter in `wrapper.calls`.
+#     Measure function execution time and print:
+#     `Executed in <milliseconds> ms`
 
-    Example:
-    >>> @count_calls
-    ... def ping():
-    ...     return "ok"
-    >>> ping(); ping()
-    'ok'
-    >>> ping.calls
-    2
-    """
-    raise NotImplementedError
+#     Example:
+#     >>> @measure_time
+#     ... def work():
+#     ...     return "done"
+#     >>> work()
+#     done
+#     """
+#     raise NotImplementedError
 
 
-def ensure_non_negative(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Problem 12. `ensure_non_negative` decorator.
+# def count_calls(func: Callable[..., Any]) -> Callable[..., Any]:
+#     """Problem 11. `count_calls` decorator.
 
-    Raise `ValueError` when the decorated function returns a negative number.
+#     Count how many times the wrapped function is called.
+#     Store the counter in `wrapper.calls`.
 
-    Example:
-    >>> @ensure_non_negative
-    ... def diff(a, b):
-    ...     return a - b
-    >>> diff(5, 2)
-    3
-    """
-    raise NotImplementedError
-
-
-def retry(times: int) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-    """Problem 13 (optional). `retry(times)` decorator.
-
-    Retry a function up to `times` retries after the initial attempt.
-    Raise `ValueError` when `times < 0`.
-
-    Example:
-    >>> @retry(2)
-    ... def flaky():
-    ...     ...
-    """
-    raise NotImplementedError
+#     Example:
+#     >>> @count_calls
+#     ... def ping():
+#     ...     return "ok"
+#     >>> ping(); ping()
+#     'ok'
+#     >>> ping.calls
+#     2
+#     """
+#     raise NotImplementedError
 
 
-def lru_cache(maxsize: int) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-    """Problem 14 (optional). `lru_cache(maxsize)` decorator factory.
+# def ensure_non_negative(func: Callable[..., Any]) -> Callable[..., Any]:
+#     """Problem 12. `ensure_non_negative` decorator.
 
-    Implement cache with Least Recently Used eviction policy.
-    Keep only the last `maxsize` used results.
-    Solve this one using a class.
+#     Raise `ValueError` when the decorated function returns a negative number.
 
-    Example:
-    >>> @lru_cache(2)
-    ... def square(x):
-    ...     return x * x
-    >>> square(2), square(3), square(2)
-    (4, 9, 4)
-    """
-    raise NotImplementedError
+#     Example:
+#     >>> @ensure_non_negative
+#     ... def diff(a, b):
+#     ...     return a - b
+#     >>> diff(5, 2)
+#     3
+#     """
+#     raise NotImplementedError
+
+
+# def retry(times: int) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+#     """Problem 13 (optional). `retry(times)` decorator.
+
+#     Retry a function up to `times` retries after the initial attempt.
+#     Raise `ValueError` when `times < 0`.
+
+#     Example:
+#     >>> @retry(2)
+#     ... def flaky():
+#     ...     ...
+#     """
+#     raise NotImplementedError
+
+
+# def lru_cache(maxsize: int) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+#     """Problem 14 (optional). `lru_cache(maxsize)` decorator factory.
+
+#     Implement cache with Least Recently Used eviction policy.
+#     Keep only the last `maxsize` used results.
+#     Solve this one using a class.
+
+#     Example:
+#     >>> @lru_cache(2)
+#     ... def square(x):
+#     ...     return x * x
+#     >>> square(2), square(3), square(2)
+#     (4, 9, 4)
+#     """
+#     raise NotImplementedError

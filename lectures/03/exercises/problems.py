@@ -38,13 +38,17 @@ class Countdown:
     """
 
     def __init__(self, n: int) -> None:
-        raise NotImplementedError
+        self.current=n
 
     def __iter__(self) -> Iterator[int]:
-        raise NotImplementedError
+        return self
 
     def __next__(self) -> int:
-        raise NotImplementedError
+        if self.current<0:
+            raise StopIteration
+        val=self.current
+        self.current-=1
+        return val
 
 
 class StepIterator:
@@ -62,13 +66,21 @@ class StepIterator:
     """
 
     def __init__(self, values: list[Any], step: int = 2) -> None:
-        raise NotImplementedError
+        if step<1:
+            raise ValueError
+        self.step=step
+        self.values=values
+        self.index=0
 
     def __iter__(self) -> Iterator[Any]:
-        raise NotImplementedError
+        return self
 
     def __next__(self) -> Any:
-        raise NotImplementedError
+        if self.index >len(self.values):
+            raise StopIteration
+        v=self.values[self.index]
+        self.index+=self.step
+        return v
 
 
 class UniqueConsecutiveIterator:
@@ -82,13 +94,22 @@ class UniqueConsecutiveIterator:
     """
 
     def __init__(self, values: list[Any]) -> None:
-        raise NotImplementedError
+        self.values=values
+        self.index=0
+        self.prev=object()
+        
 
     def __iter__(self) -> Iterator[Any]:
-        raise NotImplementedError
-
+        return self
+    
     def __next__(self) -> Any:
-        raise NotImplementedError
+        while self.index<len(self.values):
+            v=self.values[self.index]
+            self.index+=1
+            if v!=self.prev:
+                self.prev=v
+                return v
+        raise StopIteration
 
 
 class CircularIterator:
@@ -103,13 +124,23 @@ class CircularIterator:
     """
 
     def __init__(self, sequence: Sequence[Any], k: int) -> None:
-        raise NotImplementedError
+        if not sequence or k<0:
+            raise ValueError
+        self.sequence=sequence
+        self.k=k
+        self.index=0
+        self.count=0
 
     def __iter__(self) -> Iterator[Any]:
-        raise NotImplementedError
+        return self
 
     def __next__(self) -> Any:
-        raise NotImplementedError
+        if self.count>=self.k:
+            raise StopIteration
+        v=self.sequence[self.index % len(self.sequence)]
+        self.index+=1
+        self.count+=1
+        return v
 
 
 class FlattenIterator:
@@ -124,16 +155,29 @@ class FlattenIterator:
     """
 
     def __init__(self, data: list[Any]) -> None:
-        raise NotImplementedError
+        if not data:
+            raise ValueError
+        self.stack=list(reversed(data))
+
 
     def __iter__(self) -> Iterator[Any]:
-        raise NotImplementedError
+        return self
 
     def __next__(self) -> Any:
-        raise NotImplementedError
+        while self.stack:
+            v=self.stack.pop()
+            if isinstance(v,list):
+                self.stack.extend(reversed(v))
+            else:
+                return v
+        raise StopIteration
 
 
 def read_words(filename: str) -> Iterator[str]:
+    with open(filename,"r") as f:
+        for i in f:
+            for w in i.split():
+                yield w
     """Problem 6. File word reader generator.
 
     Yield one word at a time from a text file without loading the whole
@@ -143,7 +187,7 @@ def read_words(filename: str) -> Iterator[str]:
     >>> list(read_words("sample.txt"))
     ['one', 'two', 'three']
     """
-    raise NotImplementedError
+
 
 
 def batch(iterable: Iterable[Any], size: int) -> Iterator[list[Any]]:

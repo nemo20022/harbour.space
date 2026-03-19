@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Any
-
+from functools import wraps
 
 def log_calls(func: Callable[..., Any]) -> Callable[..., Any]:
     """Problem 1. `log_calls` decorator.
@@ -42,9 +42,16 @@ def log_calls(func: Callable[..., Any]) -> Callable[..., Any]:
     add(2, 3) -> 5
     5
     """
-    raise NotImplementedError
-
-
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs:Any)->Any:
+        result=func(*args,**kwargs)
+        if kwargs:
+            print(func.__name__,args,kwargs,"->",result)
+        else:
+            print(f"{func.__name__}{args} -> {result}")
+        return result
+    return wrapper
+import time
 def measure_time(func: Callable[..., Any]) -> Callable[..., Any]:
     """Problem 2. `measure_time` decorator.
 
@@ -62,7 +69,15 @@ def measure_time(func: Callable[..., Any]) -> Callable[..., Any]:
     >>> work()
     done
     """
-    raise NotImplementedError
+    def wrapper(*args,**kwargs):
+        start=time.perf_counter()
+        result=func(*args,**kwargs)
+        end=time.perf_counter()
+        x=(end-start)*1000
+        print(f"Executed in {x} ms")
+        return result
+    return wrapper
+
 
 
 def count_calls(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -80,7 +95,14 @@ def count_calls(func: Callable[..., Any]) -> Callable[..., Any]:
     >>> ping.calls
     2
     """
-    raise NotImplementedError
+    def wrapper(*args,**kwargs):
+        wrapper.calls+=1
+        result=(func(*args,**kwargs))
+        return result
+    wrapper.calls=0
+    return wrapper
+    
+
 
 
 def ensure_non_negative(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -95,7 +117,12 @@ def ensure_non_negative(func: Callable[..., Any]) -> Callable[..., Any]:
     >>> diff(5, 2)
     3
     """
-    raise NotImplementedError
+    def wrapper(*args,**kwargs):
+        result=func(*args,**kwargs)
+        if result<0:
+            raise ValueError
+        return result
+    return wrapper
 
 
 class Retry:
@@ -115,10 +142,19 @@ class Retry:
     """
 
     def __init__(self, times: int) -> None:
-        raise NotImplementedError
+        if times<0:
+                raise ValueError
+        self.times=times
 
     def __call__(self, func: Callable[..., Any]) -> Callable[..., Any]:
-        raise NotImplementedError
+        def wrapper(*args,**kwargs):
+            for i in range(self.times+1):
+                try:
+                    return func(*args,**kwargs)
+                except Exception:
+                    if i==self.times:
+                        raise ValueError
+        return wrapper
 
 
 class Throttle:
@@ -155,8 +191,23 @@ class Throttle:
     - Only successful calls should update that timestamp
     - Implement this as a class decorator
     """
-
-    pass
+    def __init__(self,interval):
+        if interval<0:
+            raise ValueError
+        self.interval=interval
+        self.last_time=None
+    
+    def __call__(self, func):
+        
+        def wrapper(*args,**kwargs):
+            start=time.perf_counter()
+            if self.last_time is not None and start-self.last_time<self.interval:
+                raise RuntimeError
+            result=func(*args,**kwargs)
+            self.last_time=start
+            return result
+        return wrapper
+        
 
 
 class CallLimit:
@@ -196,8 +247,22 @@ class CallLimit:
       after the limit is reached
     - Implement this as a class decorator
     """
-
-    pass
+    def __init__(self,limit):
+        if limit<0:
+            raise ValueError
+        self.limit=limit
+    
+    def __call__(self, func):
+        
+        def wrapper(*args,**kwargs):
+            if wrapper.calls >=self.limit:
+                raise RuntimeError
+            wrapper.calls+=1
+            result=func(*args,**kwargs)
+            
+            return result
+        wrapper.calls=0
+        return wrapper
 
 
 class LruCache:
@@ -219,7 +284,22 @@ class LruCache:
     """
 
     def __init__(self, maxsize: int) -> None:
-        raise NotImplementedError
+        if maxsize<0:
+            raise ValueError
+        self.maxsize=maxsize
 
     def __call__(self, func: Callable[..., Any]) -> Callable[..., Any]:
-        raise NotImplementedError
+        cache={}
+        def wrapper(*args,**kwargs):
+            x=(args,tuple(kwargs.items()))
+            if x in cache:
+                result=cache.pop(x)
+                cache[x]=result
+                return result
+            result=func(*args,**kwargs)
+            cache[x]=result
+            if len(cache)>self.maxsize:
+                old=next(iter(cache))
+                del cache[old]
+            return result
+        return wrapper

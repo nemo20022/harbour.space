@@ -71,11 +71,12 @@ def first_even_or_none(numbers: list[int]) -> int | None:
 
 def squares_of_even(numbers: list[int]) -> list[int]:
     """Return squares of all even numbers in input order."""
-    l=[]
-    for i in numbers:
-        if i %2==0:
-            l.append(i*i)
-    return l
+    # l=[]
+    # for i in numbers:
+    #     if i %2==0:
+    #         l.append(i*i)
+    # return l
+    return [i*i for i in numbers if i%2==0]
     raise NotImplementedError
 
 

@@ -16,14 +16,11 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-
-class MessageIn(BaseModel):
-    # TODO: add fields
-    pass
-
+class Message(BaseModel):
+    sender: str
+    text: str
 
 @app.post("/messages")
-def receive_message(payload: MessageIn) -> dict[str, str]:
-    # TODO: print message details to console
-    # TODO: return status response
-    raise NotImplementedError
+def receive_message(msg: Message):
+    print(f"{msg.sender}: {msg.text}")
+    return {"status": "received"}

@@ -12,8 +12,10 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
 @app.get("/")
 def root() -> dict[str, str]:
-    # TODO: return your health payload
-    raise NotImplementedError
+    return {"status": "ok", "service": "lecture-05"}
+
+#in terminal:
+#cd .\lectures\05\exercises\problems\
+#uvicorn 04_fastapi_get:app --reload

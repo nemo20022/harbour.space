@@ -16,12 +16,25 @@ import requests
 
 URL = "https://jsonplaceholder.typicode.com/posts"
 
-
 def main() -> None:
-    # TODO: create payload dict
-    # TODO: send POST request with json=payload
-    # TODO: print response details
-    pass
+    try:
+        payload = {
+            "title": "test title",
+            "body": "test body",
+            "userId": 1
+        }
+
+        response = requests.post(URL, json=payload)
+        response.raise_for_status()
+
+        print(response.status_code)
+        print(response.text)
+
+        data = response.json()
+        print(data)
+
+    except requests.exceptions.RequestException as e:
+        print(e)
 
 
 if __name__ == "__main__":

@@ -14,11 +14,22 @@ import requests
 
 URL = "https://example.com"
 
-
 def main() -> None:
-    # TODO: implement GET request and print HTML response
-    pass
+    try:
+        response = requests.get(URL, verify=False)
+        response.raise_for_status()
+
+        print(response.status_code)
+        content_type = response.headers.get("Content-Type")
+        print(content_type)
+        print(response.text)
+
+        print("text/html" in content_type)
+
+    except requests.exceptions.RequestException as e:
+        print(e)
 
 
 if __name__ == "__main__":
     main()
+    

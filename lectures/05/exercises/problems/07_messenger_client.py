@@ -14,13 +14,25 @@ Partner setup:
 
 import requests
 
-TARGET_BASE_URL = "https://replace-with-partner-ngrok-url"
-SENDER_NAME = "replace-with-your-name"
-
+TARGET_BASE_URL = "https://unabsorptive-flatly-erminia.ngrok-free.dev"
+SENDER_NAME = "nemo"
 
 def main() -> None:
-    # TODO: implement input loop and POST sending
-    pass
+    while True:
+        try:
+            text = input("> ")
+            payload = {
+                "sender": SENDER_NAME,
+                "text": text
+            }
+
+            response = requests.post(f"{TARGET_BASE_URL}/messages", json=payload)
+            response.raise_for_status()
+
+            print(response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            print(e)
 
 
 if __name__ == "__main__":

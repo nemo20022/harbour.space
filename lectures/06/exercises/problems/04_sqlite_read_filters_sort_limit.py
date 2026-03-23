@@ -15,16 +15,43 @@ DB_PATH = "school.db"
 
 
 def main() -> None:
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
+    conn=sqlite3.connect(DB_PATH)
+    cur=conn.cursor()
 
-    # TODO 1: age >= 22
 
-    # TODO 2 + 3: order by age desc, limit 3
+    cur.execute(
+        "SELECT * FROM students WHERE age >= ?",
+        (22,),
+    )
+    rows=cur.fetchall()
 
-    # TODO 4: track='backend' and age < 23
+    print("AGE >= 22")
+    for i in rows:
+        print(i)
+
+
+    cur.execute(
+        "SELECT * FROM students ORDER BY age DESC LIMIT 3"
+    )
+    top=cur.fetchall()
+
+    print("\nTOP 3 OLDEST")
+    for j in top:
+        print(j)
+
+
+    cur.execute(
+        "SELECT * FROM students WHERE track = ? AND age < ?",
+        ("backend",23),
+    )
+    backend=cur.fetchall()
+
+    print("\nBACKEND AND AGE < 23")
+    for k in backend:
+        print(k)
 
     conn.close()
+
 
 
 if __name__ == "__main__":

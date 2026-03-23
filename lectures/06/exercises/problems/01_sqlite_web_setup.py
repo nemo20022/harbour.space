@@ -22,10 +22,40 @@ Optional:
 - Insert one manual row directly in sqlite_web to verify table is writable.
 """
 
+import sqlite3
 
 def main() -> None:
-    # TODO: run the steps from the docstring in sqlite_web.
-    print("Complete setup steps from this file docstring.")
+    conn = sqlite3.connect("school.db")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS students (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            track TEXT NOT NULL
+        )
+        """
+    )
+    print("Created table")
+
+    cursor.execute(
+        """
+        INSERT INTO students (name, age, email, track)
+        VALUES (?, ?, ?, ?)
+        """,
+        ("Alice", 22, "alice@example.com", "backend"),
+    )
+
+    conn.commit()
+    cursor.execute("SELECT * FROM students")
+
+    for row in cursor.fetchall():
+        print(row)
+
+    conn.close()
 
 
 if __name__ == "__main__":

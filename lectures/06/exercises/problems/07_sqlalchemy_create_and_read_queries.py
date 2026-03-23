@@ -17,22 +17,54 @@ from sqlalchemy.orm import Session
 
 from db_models import Assignment, Student
 
-DB_URL = "sqlite:///school.db"
-
+DB_URL = "sqlite:///C:/Users/amal_/harbour.space/school.db"
+#couldnt get it to work because of database issues but i think code is correct
 
 def main() -> None:
-    engine = create_engine(DB_URL, echo=False)
+    engine=create_engine(DB_URL, echo=False)
 
     with Session(engine) as session:
-        # TODO 1: add an assignment for an existing student
 
-        # TODO 2: read all students
 
-        # TODO 3: read filtered + sorted students
+        student = session.execute(
+            select(Student).where(Student.email=="ana@example.com")
+        ).scalar_one()
 
-        # TODO 4: read assignments with student data
+        new_assignment = Assignment(
+            title="SQL Homework",
+            score=95,
+            student_id=student.id,
+        )
+
+        session.add(new_assignment)
+
+
+        print("ALL STUDENTS")
+        students=session.execute(select(Student)).scalars().all()
+        for s in students:
+            print(s.id,s.name,s.age,s.email,s.track)
+
+
+        print("\nAGE >= 22 (DESC)")
+        filtered=session.execute(
+            select(Student)
+            .where(Student.age>=22)
+            .order_by(Student.age.desc())
+        ).scalars().all()
+
+        for s in filtered:
+            print(s.name,s.age)
+
+
+        print("\nASSIGNMENTS WITH STUDENTS")
+        assignments=session.execute(select(Assignment)).scalars().all()
+
+        for a in assignments:
+            print(a.title,a.score,"->",a.student.name)
 
         session.commit()
+
+
 
 
 if __name__ == "__main__":

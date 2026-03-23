@@ -27,6 +27,8 @@ class Student(Base):
 
     # TODO: add relationship to Assignment
     # assignments: Mapped[list["Assignment"]] = relationship(back_populates="student")
+    
+    assignments: Mapped[list["Assignment"]]=relationship(back_populates="student")
 
 
 class Assignment(Base):
@@ -39,3 +41,4 @@ class Assignment(Base):
 
     # TODO: add relationship back to Student
     # student: Mapped[Student] = relationship(back_populates="assignments")
+    student: Mapped["Student"]=relationship(back_populates="assignments")

@@ -2,6 +2,8 @@
 For this assignment, I created a simple notes API using FastAPI that allows users to create and retrieve notes through HTTP requests. The API includes endpoints to add a new note and view existing notes, and it is connected to a PostgreSQL database to store the data. I deployed the application using Railway by linking my GitHub repository, setting up the database, and configuring the necessary environment variables. I tested the API using the `/docs` interface, where I successfully created and retrieved notes, confirming that the backend and database are working correctly.
 
 The API was successfully deployed and tested on Railway. The live service may be stopped afterward to conserve resources.
+
+Screenshot is avaliable in the folder to prove it worked before deleting the service.
 ###################################################################################################################
 
 

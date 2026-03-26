@@ -43,7 +43,14 @@ def aliasing_after_append() -> tuple[list[int], list[int], bool]:
     Return:
         (a, b, same_identity) where same_identity is `id(a) == id(b)`.
     """
-    raise NotImplementedError
+    
+    a = [1, 2]
+    b = a
+    b.append(3)
+
+    same = id(a) == id(b)
+    return a, b, same
+
 
 
 def copy_after_append() -> tuple[list[int], list[int], bool]:
@@ -60,7 +67,12 @@ def copy_after_append() -> tuple[list[int], list[int], bool]:
     Return:
         (a, b, same_identity) where same_identity should be False.
     """
-    raise NotImplementedError
+    
+    a = [1, 2]
+    b = a.copy()
+    b.append(3)
+    same = id(a) == id(b)
+    return a, b, same
 
 
 def rebind_after_concat() -> tuple[list[int], list[int], bool]:
@@ -78,9 +90,14 @@ def rebind_after_concat() -> tuple[list[int], list[int], bool]:
         (a, b, same_identity) with `a == [1, 2]`, `b == [1, 2, 3]`,
         and same_identity False.
     """
-    raise NotImplementedError
+    a = [1, 2]
+    b = a
+    b = b + [3]
+    same = id(a) == id(b)
+    return a, b, same
 
-
+from copy import deepcopy
+import sys
 def refcount_steps() -> tuple[int, int, int]:
     """Mission 5: track reference count changes when aliasing.
 
@@ -96,7 +113,13 @@ def refcount_steps() -> tuple[int, int, int]:
         with_alias_count == start_count + 1
         after_delete_count == start_count
     """
-    raise NotImplementedError
+    obj=[]
+    start=sys.getrefcount(obj)
+    alias=obj
+    cnt=sys.getrefcount(obj)
+    del alias
+    afterDelete=sys.getrefcount(obj)
+    return start,cnt,afterDelete
 
 
 def make_incrementer(start: int = 0) -> Callable[[], int]:
@@ -112,7 +135,14 @@ def make_incrementer(start: int = 0) -> Callable[[], int]:
         inc() -> 11
         inc() -> 12
     """
-    raise NotImplementedError
+    
+    value=start
+    def increment()->int:
+        nonlocal value
+        value+=1
+        return value
+    return increment
+
 
 
 def inject_with_exec(namespace: dict[str, object], statement: str) -> dict[str, object]:
@@ -139,7 +169,12 @@ def function_locals_snapshot() -> dict[str, int]:
     Return `dict(locals())` from that inner function.
     Expected output shape: {"a": 10, "b": 20}
     """
-    raise NotImplementedError
+    def func()->dict:
+        a=10
+        b=20
+        return dict(locals())
+    return func()
+
 
 
 def cycle_collected() -> bool:
@@ -172,4 +207,10 @@ def shallow_vs_deep_copy_state() -> tuple[list[list[int]], list[list[int]], list
         shallow == [[1, 99], [2]]
         deep == [[1], [2]]
     """
-    raise NotImplementedError
+    
+    original = [[1], [2]]
+    shallow = original.copy()
+    deep = deepcopy(original)
+    shallow[0].append(99)
+    return (original, shallow, deep)
+
